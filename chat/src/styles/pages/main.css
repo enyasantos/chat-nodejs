@@ -10,7 +10,33 @@
 
 .users__info {
   display: grid;
-  grid-template-rows: 150px calc(100vh - 150px);
+  grid-template-rows: 200px calc(100vh - 200px);
+}
+
+.btn__logout {
+  cursor: pointer;
+
+  text-transform: uppercase;
+  border: none;
+  padding: 5px 15px;
+
+  font-size: 10px;
+  letter-spacing: 0.2em;
+
+  background: #35354B;
+
+  color: #1C1C28;
+
+  margin-bottom: 25px;
+  margin-left: 25px;
+
+  align-self: end;
+
+  transition: all .3s ease-in-out;
+}
+
+.btn__logout:hover {
+  background: #2B2B3D;
 }
 
 .me__info {

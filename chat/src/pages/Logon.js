@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import { useHistory } from 'react-router-dom';
 
 import { v4 as uuidv4 } from 'uuid';
 
 import '../styles/pages/logon.css';
+
+import api from '../services/api';
 
 export default function Logon() {
 
@@ -17,10 +19,7 @@ export default function Logon() {
         if(!event.target.files) {
             return;
         }
-
-        const urlImage = URL.createObjectURL(event.target.files[0]);
-
-        setAvatar(urlImage);
+       setAvatar(event.target.files[0]);
     }
 
     function handleUsername(event) {
@@ -32,12 +31,30 @@ export default function Logon() {
 
         const id = uuidv4();
 
-        localStorage.setItem('id', id);
-        localStorage.setItem('avatar', avatar);
-        localStorage.setItem('username', username);
+        const data = new FormData();
+        data.append('id', id);
+        data.append('username', username);
+        data.append('avatar', avatar);
 
-        history.push('/chat');
+        api.post('users', data)
+        .then(response => {
+            localStorage.setItem('id', id);
+            localStorage.setItem('username', username);
+                
+            history.push('/chat');
+        })
+        .catch(err => console.error(err))
     }
+
+    useEffect(() => {
+        const id = localStorage.getItem('id');
+        const user = localStorage.getItem('username');
+        const imageUrl = localStorage.getItem('avatar');
+
+        if( id && user && imageUrl ) 
+            history.push('/chat');
+        
+    }, []);
 
     return (
         <div className="logo__page">
