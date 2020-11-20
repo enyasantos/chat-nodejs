@@ -41,7 +41,7 @@ io.on('connection', socket => {
 
 app.use('/uploads', express.static(path.join(__dirname, '..', 'public', 'avatar')));
 
-app.post('/users',  upload.single('avatar'), (req, res) => {
+app.post('/users', upload.single('avatar'), (req, res) => {
 
     const {
         id,
@@ -63,8 +63,24 @@ app.post('/users',  upload.single('avatar'), (req, res) => {
         image,
         id_access
     })
-    .then(response => res.status(201).json(response))
-    .catch(err => console.error(err))
+    .then(response => res.status(201).json({ id_access }))
+    .catch(err => res.status(500).json({ message: 'Erro ao cadastrar mensagem no banco de dados.' }))
+});
+
+app.post('/logon', async (req, res) => {
+    const {
+        id,
+    } = req.body;
+
+    connection('users')
+    .where('id_access', id)
+    .select('*')
+    .then(response => {
+        if(response.length)
+            return res.status(200).json({ message: 'ok', id: response[0].id })
+        return res.status(400).json({ message: 'Usuário não registrado.' })
+    })
+    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
 });
 
 app.get('/users/:index', (req, res) => {
@@ -73,16 +89,20 @@ app.get('/users/:index', (req, res) => {
     connection('users')
     .where('id', id)
     .select('*')
-    .then(response => res.status(200).json(response))
-    .catch(err => console.error(err))
-})
+    .then(response => {
+        if(response.length)
+            return res.status(200).json(response)
+        return res.status(400).json({ message: 'Usuário não registrado.' })
+    })
+    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
+});
 
 app.get('/', (req, res) => {
     connection('messages')
     .join('users as u', 'u.id', 'messages.user_id')
     .select('messages.*', 'u.username', 'u.image')
     .then(response => res.status(200).json(response))
-    .catch(err => console.error(err))
+    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
 })
 
 server.listen(3001, () => console.log('🔥 Server is running in port 3001.'));

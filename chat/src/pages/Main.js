@@ -78,6 +78,7 @@ export default function Main() {
         const id = localStorage.getItem('id');
         api.get(`users/${id}`)
         .then( response => {
+            console.log(response);
             setId(response.data[0].id);
             setUsername(response.data[0].username);
             setAvatar(response.data[0].image);

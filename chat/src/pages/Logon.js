@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
-import { useHistory } from 'react-router-dom';
-
-import { v4 as uuidv4 } from 'uuid';
+import { useHistory, Link } from 'react-router-dom';
 
 import '../styles/pages/logon.css';
 
@@ -12,73 +10,67 @@ export default function Logon() {
 
     const history = useHistory();
 
-    const [ avatar, setAvatar ] = useState('');
-    const [ username, setUsername ] = useState('');
-
-    function handleSelectImages(event) {
-        if(!event.target.files) {
-            return;
-        }
-       setAvatar(event.target.files[0]);
-    }
-
-    function handleUsername(event) {
-        setUsername(event.target.value);
-    }
+    const [ idAccess, setIdAcess ] = useState('');
+    const [ message, setMessage ] = useState('');
 
     function handleSubmitForm(event) {
         event.preventDefault();
 
-        const id = uuidv4();
+        if(!idAccess.trim()) {
+            setMessage('ID inválido.');
+            return;
+        }
 
-        const data = new FormData();
-        data.append('id', id);
-        data.append('username', username);
-        data.append('avatar', avatar);
+        const data = { id: idAccess }
 
-        api.post('users', data)
+        api.post('logon', data)
         .then(response => {
+            const id = response.data.id;
             localStorage.setItem('id', id);
-            localStorage.setItem('username', username);
-                
+            setIdAcess('');
             history.push('/chat');
         })
-        .catch(err => console.error(err))
+        .catch(err => {
+            const message = `${err.response.status} - ${err.response.data.message}`;
+            setMessage(message);
+            const messageHTML = document.getElementById('message__alert');
+            messageHTML.style.display = 'flex';
+        })
     }
 
-    useEffect(() => {
-        const id = localStorage.getItem('id');
-        const user = localStorage.getItem('username');
-        const imageUrl = localStorage.getItem('avatar');
+    function handleIdAccess(event) {
+        setIdAcess(event.target.value);
+    }
 
-        if( id && user && imageUrl ) 
-            history.push('/chat');
-        
-    }, []);
+    function handleCloseMessage(event) {
+        event.preventDefault();
+        setMessage('');
+    }
 
     return (
-        <div className="logo__page">
-            <form 
-                onSubmit={handleSubmitForm} 
-                className="form__info-user"
-            >
-                <label htmlFor="avatar">Adicionar imagem</label>
-                <input 
-                    type="file" 
-                    id="avatar" 
-                    onChange={handleSelectImages}
-                />
-                <label htmlFor="username">Username</label>
-                <div className="user__name">
+        <div className="logon__page">
+            <form onSubmit={handleSubmitForm} className="content__logon">
+                { message &&
+                <p className="message__alert message__error" id="message__alert-error">
+                    <span>
+                    <strong>Erro! </strong>
+                    {message}
+                    </span>
+                    <button className="btn__message-alert" onClick={handleCloseMessage} >X</button>
+                </p>}
+                <label htmlFor="id">ID de acesso</label>
+                <div className="id__access">
                     <input 
                         type="text" 
-                        name="username" 
-                        id="username"
-                        onChange={handleUsername}
+                        name="id__access" 
+                        id="ids"
+                        value={idAccess}
+                        onChange={handleIdAccess}
                     />
                     <button type="submit">Continuar</button>
                 </div>
             </form>
+            <Link to="/register">Não possui um conta?</Link>
         </div>
     );
 }

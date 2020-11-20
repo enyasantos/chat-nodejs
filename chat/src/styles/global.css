@@ -12,3 +12,64 @@ body {
 
   font-family: 'Lato', sans-serif;
 }
+
+.message__alert {
+  width: 100%;
+
+  background: #FFFFFF;
+
+  border: 1px solid #FFFFFF;
+  border-radius: 4px;
+
+  padding: 10px;
+
+  display: flex;
+  justify-content: space-between;
+
+  font-size: 14px;
+
+  margin-bottom: 50px;
+}
+
+.message__alert span {
+  margin: 0;
+  padding: 0;
+}
+
+.message__alert button.btn__message-alert {
+  cursor: pointer;
+
+  outline: 0;
+
+  border: 0;
+  background: transparent;
+
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.message__error {
+  background: #F8D7DA;
+
+  border-color:#F09CA4;
+  border-radius: 4px;
+
+  color: #722024;
+}
+
+.message__error button.btn__message-alert {
+  color: #722024;
+}
+
+.message__success {
+  background: #D4EDDB;
+
+  border-color:#AFD4BA;
+  border-radius: 4px;
+
+  color: #385724;
+}
+
+.message__success button.btn__message-alert {
+  color: #385724;
+}

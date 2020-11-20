@@ -5,8 +5,9 @@ import {
     Route
 } from 'react-router-dom';
 
-import Chat from './pages/Main';
+import Register from './pages/Register';
 import Logon from './pages/Logon';
+import Chat from './pages/Main';
 
 export default function Routes() {
 
@@ -14,6 +15,7 @@ export default function Routes() {
         <BrowserRouter>
         <Switch>
             <Route path="/" exact component={Logon}/>
+            <Route path="/register" component={Register}/>
             <Route path="/chat" component={Chat}/>
         </Switch>
         </BrowserRouter>
