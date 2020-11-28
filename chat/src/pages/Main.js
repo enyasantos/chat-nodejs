@@ -4,21 +4,12 @@ import '../styles/pages/main.css';
 
 import { useHistory } from 'react-router-dom';
 
-import io from "socket.io-client";
+import socket from '../services/socket';
 
 import SendMessage from '../assets/send.png';
 import Keyboard from '../assets/keyboard.png';
 
 import api from '../services/api';
-
-const options = {
-    rememberUpgrade:true,
-    transports: ['websocket'],
-    secure:true, 
-    rejectUnauthorized: false
-}
-const socket = io('http://localhost:3001', options);
-socket.on('connect', () => console.log('[IO] Connect => New connection has been established.'))
 
 export default function Main() {
 
@@ -29,6 +20,8 @@ export default function Main() {
     const [ username, setUsername ] = useState('');
     const [ avatar, setAvatar ] = useState('');
     const [ id, setId ] = useState('');
+
+    const [ usersOnline, setUsersOnline ] = useState([]);
     
     function handleInputChange(event) {
         setMessage(event.target.value)
@@ -53,6 +46,9 @@ export default function Main() {
     function handleLogout(event) {
         event.preventDefault();
         localStorage.clear();
+
+        socket.emit("user_disconnected", id);
+
         history.push('/');
     }
 
@@ -72,19 +68,24 @@ export default function Main() {
             setMessages(messagesAPI)
         })
         .catch(err => console.error(err));
-    }, [])
 
-    useEffect(() => {
+
         const id = localStorage.getItem('id');
         api.get(`users/${id}`)
         .then( response => {
-            console.log(response);
             setId(response.data[0].id);
             setUsername(response.data[0].username);
             setAvatar(response.data[0].image);
         })
         .catch( err => console.error(err))
-        
+
+
+        function handleUserOnline (data) {
+            setUsersOnline(data);
+        }
+        socket.on("user_connected", handleUserOnline);
+    
+
     }, []);
 
     useEffect(() => {
@@ -92,7 +93,7 @@ export default function Main() {
             setMessages([...messages, newMessage])
         }
         socket.on('chat.message', handleNewMessage)
-        return () => socket.off('chat.message', handleNewMessage)
+        return () => socket.off('chat.message', handleNewMessage )
     }, [messages]);
 
     return (
@@ -114,81 +115,13 @@ export default function Main() {
                         <p>Usuários onlines</p>
                     </header>
                     <ul className="list__u">
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
-                        <li className="user">
-                            <img className="user__profile-image" src="https://images.unsplash.com/photo-1605434939526-d237502a6f16?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=634&q=80" alt="Pedro Silva"/>
-                            <span className="online"></span>
-                            <p>Antonio Luiz</p>
-                        </li>
+                        {usersOnline.map(u => (
+                            <li className="user">
+                                <img className="user__profile-image" src={`http://localhost:3001/uploads/${u.avatar}`} alt={u.username}/>
+                                <span className="online"></span>
+                                <p>{u.username}</p>
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </aside>

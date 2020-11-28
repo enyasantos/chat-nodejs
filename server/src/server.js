@@ -19,10 +19,12 @@ const path = require('path');
 
 const crypto = require('crypto');
 
+var users = [];
+
 io.on('connection', socket => {
     console.log(`Socket conectado: ${socket.id}`);
     socket.on('chat.message', data => {
-        console.log('[SOCKET] Chat.message => ', data)
+        //console.log('[SOCKET] Chat.message => ', data)
         io.emit('chat.message', data);
 
         connection('messages').insert({
@@ -33,8 +35,27 @@ io.on('connection', socket => {
         .then(response => console.log('Save'))
         .catch(err => console.error({ error: err }))
     });
-    socket.on('disconnect', () => {
-        console.log('[SOCKET] Discconect => A connection was disconnected');
+    
+    socket.on("user_connected", data => {
+        // console.log('[SOCKET] User connected => ' + data);
+
+        connection('users')
+        .where('id', data)
+        .select('*')
+        .then(response => {
+            if(response.length)
+                users.push({ id: response[0].id , username: response[0].username, avatar: response[0].image})
+        io.emit("user_connected", users);
+    })
+    .catch(err => console.log(err))
+    });
+
+    socket.on('user_disconnected', data => {
+        //console.log('[SOCKET] Discconect => A connection was disconnected');
+        const usersCurrent = users.filter((value, index, arr) => {
+            return value.id !== data
+        })
+        users = usersCurrent
     })
 });
 

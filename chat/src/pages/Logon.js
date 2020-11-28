@@ -6,6 +6,8 @@ import '../styles/pages/logon.css';
 
 import api from '../services/api';
 
+import socket from '../services/socket';
+
 export default function Logon() {
 
     const history = useHistory();
@@ -28,6 +30,9 @@ export default function Logon() {
             const id = response.data.id;
             localStorage.setItem('id', id);
             setIdAcess('');
+
+            socket.emit("user_connected", id);
+
             history.push('/chat');
         })
         .catch(err => {
@@ -37,6 +42,10 @@ export default function Logon() {
             messageHTML.style.display = 'flex';
         })
     }
+
+    // 6ba920ef
+    // d95a66af
+
 
     function handleIdAccess(event) {
         setIdAcess(event.target.value);
