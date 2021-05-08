@@ -30,6 +30,7 @@ Chat online feito com socket.io, node.js, express e react.
 ```
 git clone https://github.com/enyasantos/chat-nodejs.git
 cd server
+npx knex migrate:latest
 yarn install or npm install
 yarn start:dev or npm start:dev
 ```
