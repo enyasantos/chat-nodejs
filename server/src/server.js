@@ -22,7 +22,8 @@ const crypto = require('crypto');
 var users = [];
 
 io.on('connection', socket => {
-    console.log(`Socket conectado: ${socket.id}`);
+    //console.log(`Socket conectado: ${socket.id}`);
+
     socket.on('chat.message', data => {
         //console.log('[SOCKET] Chat.message => ', data)
         io.emit('chat.message', data);
@@ -32,22 +33,22 @@ io.on('connection', socket => {
             time: data.time,
             content: data.message
         })
-        .then(response => console.log('Save'))
-        .catch(err => console.error({ error: err }))
+            .then(response => console.log('Save message'))
+            .catch(err => console.error({ error: err }))
     });
-    
+
     socket.on("user_connected", data => {
-        // console.log('[SOCKET] User connected => ' + data);
+        //console.log('[SOCKET] User connected => ' + data);
 
         connection('users')
-        .where('id', data)
-        .select('*')
-        .then(response => {
-            if(response.length)
-                users.push({ id: response[0].id , username: response[0].username, avatar: response[0].image})
-        io.emit("user_connected", users);
-    })
-    .catch(err => console.log(err))
+            .where('id', data)
+            .select('*')
+            .then(response => {
+                if (response.length)
+                    users.push({ id: response[0].id, username: response[0].username, avatar: response[0].image })
+                io.emit("user_connected", users);
+            })
+            .catch(err => console.log(err))
     });
 
     socket.on('user_disconnected', data => {
@@ -73,7 +74,7 @@ app.post('/users', upload.single('avatar'), (req, res) => {
 
     const requestImages = req.file;
 
-    if(requestImages)
+    if (requestImages)
         image = requestImages.filename;
 
     const id_access = crypto.randomBytes(4).toString('HEX');
@@ -84,8 +85,8 @@ app.post('/users', upload.single('avatar'), (req, res) => {
         image,
         id_access
     })
-    .then(response => res.status(201).json({ id_access }))
-    .catch(err => res.status(500).json({ message: 'Erro ao cadastrar mensagem no banco de dados.' }))
+        .then(response => res.status(201).json({ id_access }))
+        .catch(err => res.status(500).json({ message: 'Erro ao cadastrar mensagem no banco de dados.' }))
 });
 
 app.post('/logon', async (req, res) => {
@@ -94,36 +95,36 @@ app.post('/logon', async (req, res) => {
     } = req.body;
 
     connection('users')
-    .where('id_access', id)
-    .select('*')
-    .then(response => {
-        if(response.length)
-            return res.status(200).json({ message: 'ok', id: response[0].id })
-        return res.status(400).json({ message: 'Usuário não registrado.' })
-    })
-    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
+        .where('id_access', id)
+        .select('*')
+        .then(response => {
+            if (response.length)
+                return res.status(200).json({ message: 'ok', id: response[0].id })
+            return res.status(400).json({ message: 'Usuário não registrado.' })
+        })
+        .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
 });
 
 app.get('/users/:index', (req, res) => {
     const id = req.params.index;
-    
+
     connection('users')
-    .where('id', id)
-    .select('*')
-    .then(response => {
-        if(response.length)
-            return res.status(200).json(response)
-        return res.status(400).json({ message: 'Usuário não registrado.' })
-    })
-    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
+        .where('id', id)
+        .select('*')
+        .then(response => {
+            if (response.length)
+                return res.status(200).json(response)
+            return res.status(400).json({ message: 'Usuário não registrado.' })
+        })
+        .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
 });
 
 app.get('/', (req, res) => {
     connection('messages')
-    .join('users as u', 'u.id', 'messages.user_id')
-    .select('messages.*', 'u.username', 'u.image')
-    .then(response => res.status(200).json(response))
-    .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
+        .join('users as u', 'u.id', 'messages.user_id')
+        .select('messages.*', 'u.username', 'u.image')
+        .then(response => res.status(200).json(response))
+        .catch(err => res.status(500).json({ message: 'Erro ao consultar banco de dados.' }))
 })
 
 server.listen(3001, () => console.log('🔥 Server is running in port 3001.'));

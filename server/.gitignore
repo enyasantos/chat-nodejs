@@ -3,3 +3,5 @@ node_modules
 !public/avatar/user.jpg
 
 public/avatar/*
+
+src/database/*.sqlite

@@ -12,13 +12,13 @@ export default function Logon() {
 
     const history = useHistory();
 
-    const [ idAccess, setIdAcess ] = useState('');
-    const [ message, setMessage ] = useState('');
+    const [idAccess, setIdAcess] = useState('');
+    const [message, setMessage] = useState('');
 
     function handleSubmitForm(event) {
         event.preventDefault();
 
-        if(!idAccess.trim()) {
+        if (!idAccess.trim()) {
             setMessage('ID inválido.');
             return;
         }
@@ -26,25 +26,26 @@ export default function Logon() {
         const data = { id: idAccess }
 
         api.post('logon', data)
-        .then(response => {
-            const id = response.data.id;
-            localStorage.setItem('id', id);
-            setIdAcess('');
+            .then(response => {
+                const id = response.data.id;
+                localStorage.setItem('id', id);
+                setIdAcess('');
 
-            socket.emit("user_connected", id);
+                socket.emit("user_connected", id);
 
-            history.push('/chat');
-        })
-        .catch(err => {
-            const message = `${err.response.status} - ${err.response.data.message}`;
-            setMessage(message);
-            const messageHTML = document.getElementById('message__alert');
-            messageHTML.style.display = 'flex';
-        })
+                history.push('/chat');
+            })
+            .catch(err => {
+                const message = `${err.response.status} - ${err.response.data.message}`;
+                setMessage(message);
+                const messageHTML = document.getElementById('message__alert');
+                messageHTML.style.display = 'flex';
+            })
     }
 
-    // 6ba920ef
-    // d95a66af
+    // 85b1d3bc
+    // 5ad049e1
+    // 603d2fcd
 
 
     function handleIdAccess(event) {
@@ -59,19 +60,19 @@ export default function Logon() {
     return (
         <div className="logon__page">
             <form onSubmit={handleSubmitForm} className="content__logon">
-                { message &&
-                <p className="message__alert message__error" id="message__alert-error">
-                    <span>
-                    <strong>Erro! </strong>
-                    {message}
-                    </span>
-                    <button className="btn__message-alert" onClick={handleCloseMessage} >X</button>
-                </p>}
+                {message &&
+                    <p className="message__alert message__error" id="message__alert-error">
+                        <span>
+                            <strong>Erro! </strong>
+                            {message}
+                        </span>
+                        <button className="btn__message-alert" onClick={handleCloseMessage} >X</button>
+                    </p>}
                 <label htmlFor="id">ID de acesso</label>
                 <div className="id__access">
-                    <input 
-                        type="text" 
-                        name="id__access" 
+                    <input
+                        type="text"
+                        name="id__access"
                         id="ids"
                         value={idAccess}
                         onChange={handleIdAccess}
